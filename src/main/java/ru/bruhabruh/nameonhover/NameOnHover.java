@@ -35,12 +35,6 @@ public final class NameOnHover extends JavaPlugin implements Listener {
         try {
             //Bukkit.getPluginManager().registerEvents(this, this);
             ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-            manager.addPacketListener(new PacketAdapter(this,   ListenerPriority.NORMAL, PacketType.Play.Client.POSITION) {
-                @Override
-                public void onPacketReceiving(PacketEvent event) {
-                    trySpawnArmorStand(event.getPlayer(), event.getPlayer().getName()+" TEST");
-                }
-            });
             manager.addPacketListener(new PacketAdapter(this,   ListenerPriority.NORMAL, PacketType.Play.Client.POSITION_LOOK) {
                 @Override
                 public void onPacketReceiving(PacketEvent event) {
