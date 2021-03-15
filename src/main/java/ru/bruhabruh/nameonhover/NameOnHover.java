@@ -3,7 +3,10 @@ package ru.bruhabruh.nameonhover;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import org.bukkit.*;
@@ -30,18 +33,25 @@ public final class NameOnHover extends JavaPlugin implements Listener {
 
         Logger logger = Bukkit.getLogger();
         try {
-            Bukkit.getPluginManager().registerEvents(this, this);
+            //Bukkit.getPluginManager().registerEvents(this, this);
+            ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+            manager.addPacketListener(new PacketAdapter(this,   ListenerPriority.NORMAL, PacketType.Play.Client.POSITION) {
+                @Override
+                public void onPacketReceiving(PacketEvent event) {
+                    trySpawnArmorStand(event.getPlayer(), event.getPlayer().getName()+" TEST");
+                }
+            });
+            manager.addPacketListener(new PacketAdapter(this,   ListenerPriority.NORMAL, PacketType.Play.Client.POSITION_LOOK) {
+                @Override
+                public void onPacketReceiving(PacketEvent event) {
+                    trySpawnArmorStand(event.getPlayer(), event.getPlayer().getName()+" TEST");
+                }
+            });
             logger.info("Plugin is enabled!");
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.warning("Plugin getting error!");
         }
-    }
-
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-
-        trySpawnArmorStand(event.getPlayer(), event.getPlayer().getName()+" TEST");
     }
 
     private static void trySpawnArmorStand(Player p, String name) {
