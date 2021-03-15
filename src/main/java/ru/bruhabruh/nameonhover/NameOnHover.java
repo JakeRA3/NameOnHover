@@ -53,7 +53,7 @@ public final class NameOnHover extends JavaPlugin implements Listener {
         packetAS.getIntegers().write(0, 500);
         packetAS.getIntegers().write(1, 1);
         packetAS.getUUIDs().write(0, UUID.randomUUID());
-        if (entity != null && entity.getType().equals(EntityType.CREEPER)
+        if (entity != null && entity.getType().equals(EntityType.PLAYER)
                 && p.getLocation().distance(entity.getLocation()) <= 5) {
 
             if (playerEntityHashMap.get(p) != null && playerEntityHashMap.get(p) == entity) { return; }
