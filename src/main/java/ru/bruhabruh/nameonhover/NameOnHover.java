@@ -41,7 +41,8 @@ public final class NameOnHover extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        trySpawnArmorStand(event.getPlayer(), "MOVE");
+
+        trySpawnArmorStand(event.getPlayer(), event.getPlayer().getName()+" TEST");
     }
 
     private static void trySpawnArmorStand(Player p, String name) {
@@ -55,10 +56,11 @@ public final class NameOnHover extends JavaPlugin implements Listener {
         packetAS.getUUIDs().write(0, UUID.randomUUID());
         if (entity != null && entity.getType().equals(EntityType.PLAYER)
                 && p.getLocation().distance(entity.getLocation()) <= 5) {
-
             if (playerEntityHashMap.get(p) != null && playerEntityHashMap.get(p) == entity) { return; }
             playerEntityHashMap.put(p, entity);
-
+            packetAS.getDoubles().write(0, entity.getLocation().getX());
+            packetAS.getDoubles().write(1, entity.getLocation().getY() + entity.getHeight()-0.36);
+            packetAS.getDoubles().write(2, entity.getLocation().getZ());
             // Mount Packet
             PacketContainer packetMount = manager.createPacket(PacketType.Play.Server.MOUNT);
             packetMount.getIntegers().write(0, entity.getEntityId());
@@ -86,8 +88,8 @@ public final class NameOnHover extends JavaPlugin implements Listener {
             // Try send packet
             try {
                 manager.sendServerPacket(p, packetAS);
-                manager.sendServerPacket(p, packetMount);
                 manager.sendServerPacket(p, packetE);
+                manager.sendServerPacket(p, packetMount);
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
