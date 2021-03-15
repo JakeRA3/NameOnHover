@@ -6,15 +6,14 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.bukkit.event.Listener;
 
@@ -47,15 +46,14 @@ public final class NameOnHover extends JavaPlugin implements Listener {
 
     private static void trySpawnArmorStand(Player p, String name) {
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-        Entity entity = getTargetEntity(p);
+        Entity entity = getTargetPlayer(p, 5);
         // Packet with Armor Stand
         PacketContainer packetAS = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 
         packetAS.getIntegers().write(0, 500);
         packetAS.getIntegers().write(1, 1);
         packetAS.getUUIDs().write(0, UUID.randomUUID());
-        if (entity != null && entity.getType().equals(EntityType.PLAYER)
-                && p.getLocation().distance(entity.getLocation()) <= 5) {
+        if (entity != null) {
             if (playerEntityHashMap.get(p) != null && playerEntityHashMap.get(p) == entity) { return; }
             playerEntityHashMap.put(p, entity);
             packetAS.getDoubles().write(0, entity.getLocation().getX());
@@ -113,31 +111,22 @@ public final class NameOnHover extends JavaPlugin implements Listener {
         }
     }
 
-    public static Entity getTargetEntity(final Entity entity) {
-        return getTarget(entity, entity.getWorld().getEntities());
-    }
-
-    public static <T extends Entity> T getTarget(final Entity entity,
-                                                 final Iterable<T> entities) {
-        if (entity == null)
-            return null;
-        T target = null;
-        final double threshold = 1;
-        for (final T other : entities) {
-            final Vector n = other.getLocation().toVector()
-                    .subtract(entity.getLocation().toVector());
-            if (entity.getLocation().getDirection().normalize().crossProduct(n)
-                    .lengthSquared() < threshold
-                    && n.normalize().dot(
-                    entity.getLocation().getDirection().normalize()) >= 0) {
-                if (target == null
-                        || target.getLocation().distanceSquared(
-                        entity.getLocation()) > other.getLocation()
-                        .distanceSquared(entity.getLocation()))
-                    target = other;
+    public static Player getTargetPlayer(Player player, int range) {
+        Vector dir = player.getLocation().getDirection().clone().multiply(0.1);
+        Location loc = player.getEyeLocation().clone();
+        for (int i = 0; i <= range * 10; i++) {
+            loc.add(dir.getX(), dir.getY(), dir.getZ());
+            if (!loc.getBlock().getType().equals(Material.AIR)) return null;
+            for (Player target : Bukkit.getOnlinePlayers()) {
+                if (target.getUniqueId().equals(player.getUniqueId())) continue;
+                if (!player.canSee(target)) continue;
+                if (target.hasPotionEffect(PotionEffectType.INVISIBILITY)) continue;
+                if (target.getGameMode().equals(GameMode.SPECTATOR)) continue;
+                if (!target.getBoundingBox().expand(0.2).contains(loc.toVector())) continue;
+                return target;
             }
         }
-        return target;
+        return null;
     }
 
     @Override
