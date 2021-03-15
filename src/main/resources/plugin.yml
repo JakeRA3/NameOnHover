@@ -1,0 +1,6 @@
+name: NameOnHover
+version: ${project.version}
+main: ru.bruhabruh.nameonhover.NameOnHover
+api-version: 1.16
+authors: [ bruhabruh ]
+depend: [ProtocolLib]
