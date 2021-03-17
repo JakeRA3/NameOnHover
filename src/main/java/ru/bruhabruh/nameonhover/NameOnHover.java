@@ -55,10 +55,12 @@ public final class NameOnHover extends JavaPlugin implements Listener {
         // Packet with Armor Stand
         PacketContainer packetAS = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 
+        Logger logger = Bukkit.getLogger(); // DEBUG
         packetAS.getIntegers().write(0, 500);
         packetAS.getIntegers().write(1, 1);
         packetAS.getUUIDs().write(0, UUID.randomUUID());
         if (entity != null) {
+            logger.info("START ADD ARMORSTAND");
             if (playerEntityHashMap.get(p) != null && playerEntityHashMap.get(p) == entity) { return; }
             playerEntityHashMap.put(p, entity);
             packetAS.getDoubles().write(0, entity.getLocation().getX());
@@ -93,11 +95,13 @@ public final class NameOnHover extends JavaPlugin implements Listener {
                 manager.sendServerPacket(p, packetAS);
                 manager.sendServerPacket(p, packetE);
                 manager.sendServerPacket(p, packetMount);
+                logger.info("END ADD ARMORSTAND");
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
 
         } else {
+            logger.info("START \"DELETE\" ARMORSTAND");
             // Packet Entity Metadata to hide name
             PacketContainer packetE = manager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
             packetE.getIntegers().write(0, packetAS.getIntegers().read(0)); //Set packet's entity id
@@ -110,6 +114,7 @@ public final class NameOnHover extends JavaPlugin implements Listener {
             playerEntityHashMap.put(p, null);
             try {
                 manager.sendServerPacket(p, packetE);
+                logger.info("END \"DELETE\" ARMORSTAND");
             } catch (InvocationTargetException e) {
 
             }
