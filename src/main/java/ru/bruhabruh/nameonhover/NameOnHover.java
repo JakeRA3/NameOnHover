@@ -38,6 +38,7 @@ public final class NameOnHover extends JavaPlugin implements Listener {
             manager.addPacketListener(new PacketAdapter(this,   ListenerPriority.NORMAL, PacketType.Play.Client.POSITION_LOOK) {
                 @Override
                 public void onPacketReceiving(PacketEvent event) {
+                    if (event.isCancelled()) { logger.warning("ИВЕНТ НИКОВ ОТМЕНЕН!"); }
                     trySpawnArmorStand(event.getPlayer(), event.getPlayer().getName()+" TEST");
                 }
             });
