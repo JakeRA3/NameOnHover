@@ -149,7 +149,7 @@ public final class NameOnHover extends JavaPlugin implements Listener {
                 if (!player.canSee(target)) continue;
                 if (target.hasPotionEffect(PotionEffectType.INVISIBILITY)) continue;
                 if (target.getGameMode().equals(GameMode.SPECTATOR)) continue;
-                if (!target.getBoundingBox().expand(0.2).contains(loc.toVector())) continue;
+                if (!target.getBoundingBox().expand(0.1).contains(loc.toVector())) continue;
                 return target;
             }
         }
